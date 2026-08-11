@@ -4,6 +4,8 @@ Welcome to **Sprint 0**! 👋
 
 This is your chance to meet your team, understand the City Air Tracker project, and refresh the skills you will use during the practicum. There are **no deliverables and no story points** for Sprint 0, but completing the preparation below will make Sprint 1 much easier.
 
+> **Note:** Nothing needs to be turned in for Sprint 0. The goal is to arrive at Sprint 1 with your team, tools, repository, and expectations in place.
+
 ## The project you will build
 
 City Air Tracker is a team-built batch data pipeline and web application. At a high level, your team will:
@@ -89,5 +91,3 @@ Before Sprint 1 begins, try to:
 - confirm access to the team's JIRA project
 - create and clone the team repository
 - confirm that every team member can communicate with the group and raise blockers
-
-> **Note:** Nothing needs to be turned in for Sprint 0. The goal is to arrive at Sprint 1 with your team, tools, repository, and expectations in place.
