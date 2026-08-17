@@ -1,2 +1,2 @@
-def check_api():
+def test_api():
     assert True
