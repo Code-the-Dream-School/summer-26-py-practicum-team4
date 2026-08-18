@@ -47,7 +47,7 @@ def get_data(city_record, start, end):
 
 #TESTING the API(testing for existance of the city/errors are not final):
 
-cities = load_cities("docs/milestones/milestone2/data/city_info.json")
+cities = load_cities("/draft/sprint2_api/data/city_data.json")
 
 # for now asking for a city in the therminal
 user_city = input("Enter city name: ")
