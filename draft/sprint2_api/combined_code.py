@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 import os
 import json
 from datetime import datetime, timezone
+import pandas as pd
+import json
+
 
 
 # Load environment variables from local .env file
@@ -15,6 +18,43 @@ API_KEY = os.getenv('API_KEY')
 if not API_KEY:
     print("No API Key found.")
 
+#Export to JSON helper function
+def export_to_json(pollution_data):
+    with open("pollution_data.json", "w") as f:
+        json.dump(pollution_data, f, indent=4)
+
+#Export to CSV helper function
+def export_to_csv(pollution_data, city_name):
+    # Turn the data list into a clean table (CSV) using Pandas
+    # This flattens the nested data automatically
+    df = pd.json_normalize(pollution_data["list"])
+
+    # Make it readable: Add the city name and clean up the column names
+    df.insert(0, "City Name", city_name)
+
+  # Convert the raw unix timestamp column into readable dates
+    df["dt"] = pd.to_datetime(df["dt"], unit="s", utc=True)
+
+    # Rename the columns so they make sense to humans
+    df.columns = [
+        "City Name",
+        "Date/Time (UTC)",
+        "AQI",
+        "CO",
+        "NO",
+        "NO2",
+        "O3",
+        "SO2",
+        "PM2.5",
+        "PM10",
+        "NH3",
+    ]
+
+    #Save as csv file
+    df.to_csv("pollution_data.csv", index=False)
+    
+
+    
 
 # Load in the json file that contains the sample data
 def load_cities(file_path):
@@ -37,7 +77,7 @@ def find_city(cities_file, city_name):
 # Returns the city record (or None) plus whatever the user typed in.
 def ask_for_city():
     # Load in JSON File
-    cities = load_cities("/draft/sprint2_api/data/city_data.json")
+    cities = load_cities("city_info.json")
 
     # Get user input
     user_city = input("Enter city name: ")
@@ -47,11 +87,13 @@ def ask_for_city():
 
     # Check if city is found in dataset
     if city is None:
-        print(f"City '{user_city}' was not found. Trying the Geocoding API instead.")
+        print(f"City '{user_city}' was not found. Trying the Geocoding API instead.") #Need to add code to pull data into database/csv file.
     else:
         print(f"{user_city} has been found")
 
     return city, user_city
+
+
 
 
 # Looks up the coordinates online if the city isn't in our JSON file.
@@ -96,7 +138,8 @@ def get_coordinates():
         # Fall back to Geocoding API
         latitude, longitude = get_latitude_longitude(user_city)
 
-    return latitude, longitude
+    return latitude, longitude, user_city
+
 
 
 # Api request
@@ -119,7 +162,7 @@ def get_data(latitude, longitude, start, end):
 # Retrieves air pollution data from OpenWeather using the coordinates obtained from the Geocoding function.
 def get_pollution_data():
 
-    latitude, longitude = get_coordinates()
+    latitude, longitude, city_name = get_coordinates()
 
     if latitude is None or longitude is None:
         print("Error: No latitude or longitude coordinates.")
@@ -129,5 +172,11 @@ def get_pollution_data():
     start = int(datetime(2026, 7, 1, tzinfo=timezone.utc).timestamp())
     end = int(datetime(2026, 8, 1, tzinfo=timezone.utc).timestamp())
 
-    pollution_data = get_data(latitude, longitude, start, end)
-    return pollution_data
+    
+    print("Fetching air pollution dataset from OpenWeather...")
+    pollution_data = get_data(latitude, longitude, start,end)
+    export_to_json(pollution_data)
+    export_to_csv(pollution_data, city_name)
+
+if __name__ == "__main__":
+    get_pollution_data()
