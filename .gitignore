@@ -156,3 +156,8 @@ data/
 # Docker
 *.pid
 .tools/
+
+__pycache__/
+*.pyc
+store_results.json
+*.json
