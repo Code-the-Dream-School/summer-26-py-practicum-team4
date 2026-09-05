@@ -156,3 +156,4 @@ data/
 # Docker
 *.pid
 .tools/
+store_results.json
