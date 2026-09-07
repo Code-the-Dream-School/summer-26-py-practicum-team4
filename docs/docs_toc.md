@@ -33,3 +33,6 @@ Student-led deliverables and milestones setup for a 6-week course:
 [Sprint 1](./milestones/sprint1.md)
 [Sprint 2](./milestones/sprint2.md)
 [Sprint 3](./milestones/sprint3.md)
+[Sprint 4](./milestones/sprint4.md)
+[Sprint 5](./milestones/sprint5.md)
+[Sprint 6](./milestones/sprint6.md)
