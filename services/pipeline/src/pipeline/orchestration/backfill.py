@@ -11,9 +11,9 @@ END_DATE   = date.today() - timedelta(days=1)
 
 #bottom dates commented out to debug to see if there is any missing data. End conclusion: its an API bug not in our end with the code.
 
-#START_DATE = date(2026, 3, 8)
-#END_DATE   = date(2026, 3, 8)
-
+#START_DATE = date(2026, 8, 30)
+#END_DATE   = date(2026, 8, 31)
+#debugged again - 12 rows that are null for Baltimore , its the same issue that is realted to the APi bug 
 #conn = psycopg2.connect(
 #    host=os.getenv("DB_Host"), 
  #   port=os.getenv("DB_Port"),
