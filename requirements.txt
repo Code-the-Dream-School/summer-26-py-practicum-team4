@@ -13,3 +13,6 @@ psycopg[binary]>=3.2
 streamlit>=1.36
 plotly>=5.22
 pytest>=8.2
+
+dash>=2.18
+google-genai>=1.0
