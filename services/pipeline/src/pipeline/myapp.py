@@ -52,15 +52,41 @@ MODEL = "gemini-3.6-flash"
 
 def get_ai(prompt):
 
-    response = client.models.generate_content(
+    try:
 
-        model=MODEL,
+        response = client.models.generate_content(
 
-        contents=prompt
+            model=MODEL,
 
-    )
+            contents=prompt
 
-    return response.text
+        )
+
+        return response.text
+
+    except Exception as error:
+
+        error_message = str(error)
+
+        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
+
+            return (
+
+                "I'm temporarily unable to answer because "
+
+                "the AI usage limit has been reached. "
+
+                "Please try again later."
+
+            )
+
+        return (
+
+            "I'm sorry, but I'm having trouble connecting "
+
+            "to the AI service right now. Please try again."
+
+        )
 
 
 #====== Extract Cities
@@ -103,7 +129,7 @@ app = Dash(
 app.layout = html.Div([
 
 
-    #====== Header
+#====== Header
 
     html.Div([
 
@@ -135,7 +161,7 @@ app.layout = html.Div([
     ], className="dashboard-header"),
 
 
-    #====== Air Flow Decoration
+#====== Air Flow Decoration
 
     html.Div(
 
@@ -164,7 +190,7 @@ app.layout = html.Div([
     ),
 
 
-    #====== City and Date Selection
+#====== City and Date Selection
 
     html.Div([
 
@@ -232,7 +258,7 @@ app.layout = html.Div([
     }),
 
 
-    #====== Error Message
+#====== Error Message
 
     html.Div(
 
@@ -253,7 +279,7 @@ app.layout = html.Div([
     ),
 
 
-    #====== Overall AQI
+#====== Overall AQI
 
     html.Div([
 
@@ -292,12 +318,12 @@ app.layout = html.Div([
     ], className="aqi-hero-card"),
 
 
-    #====== Average Pollutant Level
+#====== Average Pollutant Level
 
     html.H2("Daily Average Pollutant Levels"),
 
 
-    #====== Pollutant Cards
+#====== Pollutant Cards
 
     html.Div([
 
@@ -405,7 +431,7 @@ app.layout = html.Div([
     ], className="pollutant-container"),
 
 
-    #====== Reference Tables
+#====== Reference Tables
 
     html.H2("Air Quality Reference Guide"),
 
@@ -413,7 +439,7 @@ app.layout = html.Div([
     html.Div([
 
 
-        #====== Left Table
+#====== Left Table
 
         html.Div([
 
@@ -466,7 +492,7 @@ app.layout = html.Div([
         ], style={"width": "35%"}),
 
 
-        #====== Right Table
+#====== Right Table
 
         html.Div([
 
@@ -705,7 +731,7 @@ app.layout = html.Div([
     }),
 
 
-    #====== Hourly AQI
+#====== Hourly AQI
 
     html.H2("Average AQI by Hour"),
 
@@ -734,7 +760,7 @@ app.layout = html.Div([
     }),
 
 
-    #====== Best and Worst AQI
+#====== Best and Worst AQI
 
     html.Div([
 
@@ -770,7 +796,7 @@ app.layout = html.Div([
     ], className="aqi-cards-container"),
 
 
-    #====== AQI Distribution
+#====== AQI Distribution
 
     html.H2("AQI Distribution Across All Available Dates"),
 
@@ -799,7 +825,7 @@ app.layout = html.Div([
     }),
 
 
-    #====== AI Air Quality Chatbot
+#====== AI Air Quality Chatbot
 
     html.H2("Ask Air Tracker AI"),
 
@@ -937,7 +963,7 @@ app.layout = html.Div([
 def update_dashboard(city_id, selected_date):
 
 
-    #====== Error if no city or date selected
+#====== Error if no city or date selected
 
     if city_id is None or selected_date is None:
 
@@ -974,7 +1000,7 @@ def update_dashboard(city_id, selected_date):
         )
 
 
-    #====== Extract Pollutant Information
+#====== Extract Pollutant Information
 
     conn = get_connection()
 
@@ -1017,7 +1043,7 @@ def update_dashboard(city_id, selected_date):
         rows = cursor.fetchall()
 
 
-    #====== Extract Best and Worst AQI
+#====== Extract Best and Worst AQI
 
     with conn.cursor() as cursor:
 
@@ -1037,7 +1063,7 @@ def update_dashboard(city_id, selected_date):
 
             LIMIT 1;
 
-        """, (city_id,))
+        """ , (city_id,))
 
         best_result = cursor.fetchone()
 
@@ -1063,7 +1089,7 @@ def update_dashboard(city_id, selected_date):
         worst_result = cursor.fetchone()
 
 
-    #====== Extract Information for Pie Graph
+#====== Extract Information for Pie Graph
 
     with conn.cursor() as cursor:
 
@@ -1093,7 +1119,7 @@ def update_dashboard(city_id, selected_date):
     conn.close()
 
 
-    #====== Create DataFrame
+#====== Create DataFrame
 
     df = pd.DataFrame(
 
@@ -1126,7 +1152,7 @@ def update_dashboard(city_id, selected_date):
     )
 
 
-    #====== Error if data is not available
+#====== Error if data is not available
 
     if df.empty:
 
@@ -1163,12 +1189,12 @@ def update_dashboard(city_id, selected_date):
         )
 
 
-    #====== Dropping NA's
+#====== Dropping NA's
 
     df = df.dropna(subset=["aqi"])
 
 
-    #====== Changing the Displayed Pollutant Names
+#====== Changing the Displayed Pollutant Names
 
     pollutants = [
 
@@ -1204,7 +1230,7 @@ def update_dashboard(city_id, selected_date):
     }
 
 
-    #====== Updating the Table with Mean Values
+#====== Updating the Table with Mean Values
 
     daily_average = df[pollutants].mean().round(2)
 
@@ -1224,7 +1250,7 @@ def update_dashboard(city_id, selected_date):
     ]
 
 
-    #====== Overall AQI
+#====== Overall AQI
 
     overall_aqi = round(
 
@@ -1256,7 +1282,7 @@ def update_dashboard(city_id, selected_date):
         aqi_status = "Very Poor"
 
 
-    #====== Converting Times
+#====== Converting Times
 
     df["reading_time_utc"] = pd.to_datetime(
 
@@ -1268,7 +1294,7 @@ def update_dashboard(city_id, selected_date):
     df["hour"] = df["reading_time_utc"].dt.hour
 
 
-    #====== Error if there's unexpected number of observations
+#====== Error if there's unexpected number of observations
 
     observation_count = (
 
@@ -1312,7 +1338,7 @@ def update_dashboard(city_id, selected_date):
         )
 
 
-    #====== Hourly AQI
+#====== Hourly AQI
 
     hourly_aqi = (
 
@@ -1327,7 +1353,7 @@ def update_dashboard(city_id, selected_date):
     )
 
 
-    #====== AQI Distribution Data
+#====== AQI Distribution Data
 
     aqi_count_df = pd.DataFrame(
 
@@ -1366,7 +1392,7 @@ def update_dashboard(city_id, selected_date):
     )
 
 
-    #====== Hourly AQI Graph
+#====== Hourly AQI Graph
 
     aqi_graph = px.line(
 
@@ -1461,7 +1487,7 @@ def update_dashboard(city_id, selected_date):
     )
 
 
-    #====== Best and Worst AQI
+#====== Best and Worst AQI
 
     if best_result is not None:
 
@@ -1497,7 +1523,7 @@ def update_dashboard(city_id, selected_date):
         worst_aqi_text = "No worst AQI data available."
 
 
-    #====== AQI Distribution
+#====== AQI Distribution
 
     aqi_pie_graph = px.pie(
 
@@ -1552,7 +1578,7 @@ def update_dashboard(city_id, selected_date):
     )
 
 
-    #====== Return Callback Outputs
+#====== Return Callback Outputs
 
     return (
 
@@ -1625,14 +1651,14 @@ def update_ai_chat(
 ):
 
 
-    #====== Check Chat History
+#====== Check Chat History
 
     if chat_history is None:
 
         chat_history = []
 
 
-    #====== Welcome Message
+#====== Welcome Message
 
     if not n_clicks:
 
@@ -1691,14 +1717,14 @@ def update_ai_chat(
         ], chat_history, ""
 
 
-    #====== Check for Empty Question
+#====== Check for Empty Question
 
     if not question or not question.strip():
 
         return [], chat_history, ""
 
 
-    #====== Check City and Date
+#====== Check City and Date
 
     if city_id is None or selected_date is None:
 
@@ -1721,7 +1747,7 @@ def update_ai_chat(
         ], chat_history, ""
 
 
-    #====== Get City Name
+#====== Get City Name
 
     city_name = next(
 
@@ -1734,7 +1760,7 @@ def update_ai_chat(
     )
 
 
-    #====== Get Air Quality Data
+#====== Get Air Quality Data
 
     conn = get_connection()
 
@@ -1784,7 +1810,7 @@ def update_ai_chat(
     conn.close()
 
 
-    #====== Check for Data
+#====== Check for Data
 
     if not readings:
 
@@ -1805,7 +1831,7 @@ def update_ai_chat(
         ], chat_history, ""
 
 
-    #====== Calculate Air Quality Information
+#====== Calculate Air Quality Information
 
     data = pd.DataFrame(
 
@@ -1862,7 +1888,7 @@ def update_ai_chat(
     )
 
 
-    #====== Previous Conversation
+#====== Previous Conversation
 
     conversation = ""
 
@@ -1878,7 +1904,7 @@ def update_ai_chat(
         )
 
 
-    #====== AI Prompt
+#====== AI Prompt
 
     prompt = f"""
 
@@ -1943,12 +1969,12 @@ If they keep insisting, end the conversation.
 """
 
 
-    #====== Get AI Response
+#====== Get AI Response
 
     ai_response = get_ai(prompt)
 
 
-    #====== Save Conversation
+#====== Save Conversation
 
     chat_history.append(
 
@@ -1976,7 +2002,7 @@ If they keep insisting, end the conversation.
     )
 
 
-    #====== Display Conversation
+#====== Display Conversation
 
     chat_display = []
 
